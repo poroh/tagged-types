@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT
+#
+
+[package]
+name = "typing"
+version = "0.1.0"
+
+[dependencies]
+serde = { version = "1.0", features = [], optional = true }
+
+[features]
+serde_support = ["serde"]
+
+full = ["serde_support"]
+
