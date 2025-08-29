@@ -2,8 +2,15 @@
 #
 
 [package]
-name = "typing"
+name = "tagged-types"
 version = "0.1.0"
+license = "MIT"
+description = "Generate new types over the base type"
+repository = "https://github.com/poroh/tagged-types"
+readme = "README.md"
+documentation = "https://docs.rs/tagged-types"
+keywords = ["rust", "types"]
+categories = ["data-structures"]
 
 [dependencies]
 serde = { version = "1.0", features = [], optional = true }
