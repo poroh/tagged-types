@@ -2,7 +2,6 @@
 
 use std::marker::PhantomData;
 
-///
 /// Example for a password type:
 /// ```rust
 /// use tagged_types::TaggedType;
@@ -142,6 +141,17 @@ where
     }
 }
 
+/// Enables TaggedType to implement std::fmt::Display trait
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, TransparentDebug};
+/// pub type Username = TaggedType<String, UsernameTag>;
+/// pub enum UsernameTag {}
+/// impl TransparentDebug for UsernameTag {};
+///
+/// format!("{:?}", Username::new("admin".into()));
+/// ```
 pub trait TransparentDebug {}
 
 impl<V, T> std::fmt::Debug for TaggedType<V, T>
@@ -154,6 +164,17 @@ where
     }
 }
 
+/// Enables TaggedType to implement std::fmt::Display trait
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, TransparentDisplay};
+/// pub type Username = TaggedType<String, UsernameTag>;
+/// pub enum UsernameTag {}
+/// impl TransparentDisplay for UsernameTag {};
+///
+/// format!("{}", Username::new("admin".into()));
+/// ```
 pub trait TransparentDisplay {}
 
 impl<V, T> std::fmt::Display for TaggedType<V, T>
@@ -166,6 +187,17 @@ where
     }
 }
 
+/// Enables parsing of TaggedType to be parsed from string.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, TransparentFromStr};
+/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+/// pub enum DefaultGatewayTag {}
+/// impl TransparentFromStr for DefaultGatewayTag {};
+///
+/// let default_gw: DefaultGateway = "192.168.0.1".parse().unwrap();
+/// ```
 pub trait TransparentFromStr {}
 
 impl<V, T> std::str::FromStr for TaggedType<V, T>
@@ -179,6 +211,32 @@ where
             v: V::from_str(s)?,
             _marker: PhantomData,
         })
+    }
+}
+
+/// Gives possibility to convert from inner type to the tagged type using From/Into.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, TransparentFromInner};
+/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+/// pub enum DefaultGatewayTag {}
+/// impl TransparentFromInner for DefaultGatewayTag {};
+///
+/// let ip: std::net::IpAddr = "192.168.0.1".parse().unwrap();
+/// let default_gw: DefaultGateway = ip.into();
+/// ```
+pub trait TransparentFromInner {}
+
+impl<V, T> From<V> for TaggedType<V, T>
+where
+    T: TransparentFromInner,
+{
+    fn from(v: V) -> Self {
+        Self {
+            v,
+            _marker: PhantomData,
+        }
     }
 }
 
@@ -233,11 +291,58 @@ mod tests {
     }
 
     #[test]
+    fn test_default() {
+        enum CounterU64Tag {}
+        type CounterU64 = TaggedType<u64, CounterU64Tag>;
+        let c = CounterU64::default();
+        assert_eq!(*c.inner(), 0);
+    }
+
+    #[test]
+    fn test_copy() {
+        enum CounterU64Tag {}
+        type CounterU64 = TaggedType<u64, CounterU64Tag>;
+        impl TransparentDebug for CounterU64Tag {}
+        let c = CounterU64::default();
+        let v = c;
+        assert_eq!(v, c);
+    }
+
+    #[test]
+    fn test_clone() {
+        enum UsernameTag {}
+        type Username = TaggedType<String, UsernameTag>;
+        impl TransparentDebug for UsernameTag {}
+        let c = Username::new("admin".into());
+        let v = c.clone();
+        assert_eq!(v, c);
+    }
+
+    #[test]
     fn test_transparent_display() {
         enum UrlStringTag {}
         impl TransparentDisplay for UrlStringTag {}
         type UrlString = TaggedString<UrlStringTag>;
         let url = UrlString::new(URL.into());
         assert_eq!(format!("url: {url}"), format!("url: {URL}"));
+    }
+
+    #[test]
+    fn test_transparent_debug() {
+        enum UrlStringTag {}
+        impl TransparentDebug for UrlStringTag {}
+        type UrlString = TaggedString<UrlStringTag>;
+        let url = UrlString::new(URL.into());
+        assert_eq!(format!("url: {url:?}"), format!("url: {URL:?}"));
+    }
+
+    #[test]
+    fn test_transparent_from_str() {
+        type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+        enum DefaultGatewayTag {}
+        impl TransparentFromStr for DefaultGatewayTag {}
+        const IP: &str = "192.168.0.1";
+        let gw: DefaultGateway = IP.parse().unwrap();
+        assert_eq!(gw.inner(), &IP.parse::<std::net::IpAddr>().unwrap());
     }
 }
