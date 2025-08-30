@@ -13,8 +13,12 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-serde = { version = "1.0", features = [], optional = true }
-tagged-types-derive = { path = "../derive", optional = true }
+serde = { workspace = true, optional = true }
+tagged-types-derive = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde = { workspace = true, features = [ "derive" ] }
+serde_json = { workspace = true }
 
 [features]
 default = [ "full" ]

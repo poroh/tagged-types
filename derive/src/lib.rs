@@ -87,7 +87,7 @@ fn handle_transparent(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) 
     if let Some(impl_attr) = find_attr(derive, "transparent") {
         match impl_attr.parse_nested_meta(|meta| {
             match meta.path.require_ident()?.to_string().as_str() {
-                s @ ("Display" | "Debug" | "FromStr") => {
+                s @ ("Display" | "Debug" | "FromStr" | "Serialize" | "Deserialize") => {
                     let trait_name = quote::format_ident!("Transparent{s}");
                     out.extend(quote! {
                         impl #trait_name for #name {}

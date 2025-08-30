@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: MIT
 
-
 [workspace]
 members = [
    "lib",
@@ -16,4 +15,16 @@ edition = "2018"
 keywords = ["rust", "types"]
 categories = ["data-structures"]
 documentation = "https://docs.rs/tagged-types"
+
+[workspace.dependencies]
+# Optional dependencies for tagged-types
+tagged-types-derive = { version = "0.2", path = "./derive" }
+serde = { version = "1.0", features = [] }
+# For testing:
+serde_json = { version = "1.0" }
+# Dependencies of tagged-types-derive
+syn = { version = "2", features = ["full"] }
+quote = { version = "1" }
+proc-macro2 = { version = "1" }
+
 

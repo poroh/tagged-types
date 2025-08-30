@@ -15,9 +15,7 @@ use crate::TransparentFromStr;
 use core::marker::PhantomData;
 
 #[cfg(feature = "support_serde")]
-use crate::TransparentDeserialize;
-#[cfg(feature = "support_serde")]
-use crate::TransparentSerialize;
+pub mod serde;
 
 /// Example for a password type:
 /// ```rust
@@ -224,34 +222,6 @@ where
             v,
             _marker: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "support_serde")]
-impl<V, T> serde::Serialize for TaggedType<V, T>
-where
-    V: serde::Serialize,
-    T: TransparentSerialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self.v.serialize(serializer)
-    }
-}
-
-#[cfg(feature = "support_serde")]
-impl<'de, V, T> serde::Deserialize<'de> for TaggedType<V, T>
-where
-    V: serde::Deserialize<'de>,
-    T: TransparentDeserialize,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        V::deserialize(deserializer).map(Self::new)
     }
 }
 
