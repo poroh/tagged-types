@@ -1,6 +1,23 @@
 // SPDX-License-Identifier: MIT
 
+use crate::ImplementClone;
+use crate::ImplementCopy;
+use crate::ImplementDefault;
+use crate::ImplementDeref;
+use crate::ImplementEq;
+use crate::ImplementHash;
+use crate::ImplementPartialEq;
+use crate::InnerAccess;
+use crate::TransparentDebug;
+use crate::TransparentDisplay;
+use crate::TransparentFromInner;
+use crate::TransparentFromStr;
 use std::marker::PhantomData;
+
+#[cfg(feature = "serde_support")]
+use crate::TransparentDeserialize;
+#[cfg(feature = "serde_support")]
+use crate::TransparentSerialize;
 
 /// Example for a password type:
 /// ```rust
@@ -74,7 +91,12 @@ impl<V, T> TaggedType<V, T> {
             _marker: PhantomData,
         }
     }
+}
 
+impl<V, T> TaggedType<V, T>
+where
+    T: InnerAccess,
+{
     pub fn inner(&self) -> &V {
         &self.v
     }
@@ -84,7 +106,10 @@ impl<V, T> TaggedType<V, T> {
     }
 }
 
-impl<V, T> std::ops::Deref for TaggedType<V, T> {
+impl<V, T> std::ops::Deref for TaggedType<V, T>
+where
+    T: ImplementDeref,
+{
     type Target = V;
 
     fn deref(&self) -> &Self::Target {
@@ -95,6 +120,7 @@ impl<V, T> std::ops::Deref for TaggedType<V, T> {
 impl<V, T> Clone for TaggedType<V, T>
 where
     V: Clone,
+    T: ImplementClone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -104,11 +130,17 @@ where
     }
 }
 
-impl<V, T> Copy for TaggedType<V, T> where V: Copy {}
+impl<V, T> Copy for TaggedType<V, T>
+where
+    V: Copy,
+    T: ImplementCopy + ImplementClone,
+{
+}
 
 impl<V, T> std::hash::Hash for TaggedType<V, T>
 where
     V: std::hash::Hash,
+    T: ImplementHash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -121,17 +153,24 @@ where
 impl<V, T> PartialEq for TaggedType<V, T>
 where
     V: PartialEq,
+    T: ImplementPartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.v.eq(&other.v)
     }
 }
 
-impl<V, T> Eq for TaggedType<V, T> where V: Eq {}
+impl<V, T> Eq for TaggedType<V, T>
+where
+    V: Eq,
+    T: ImplementEq + ImplementPartialEq,
+{
+}
 
 impl<V, T> Default for TaggedType<V, T>
 where
     V: Default,
+    T: ImplementDefault,
 {
     fn default() -> Self {
         Self {
@@ -140,19 +179,6 @@ where
         }
     }
 }
-
-/// Enables TaggedType to implement std::fmt::Display trait
-///
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, TransparentDebug};
-/// pub type Username = TaggedType<String, UsernameTag>;
-/// pub enum UsernameTag {}
-/// impl TransparentDebug for UsernameTag {};
-///
-/// format!("{:?}", Username::new("admin".into()));
-/// ```
-pub trait TransparentDebug {}
 
 impl<V, T> std::fmt::Debug for TaggedType<V, T>
 where
@@ -164,19 +190,6 @@ where
     }
 }
 
-/// Enables TaggedType to implement std::fmt::Display trait
-///
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, TransparentDisplay};
-/// pub type Username = TaggedType<String, UsernameTag>;
-/// pub enum UsernameTag {}
-/// impl TransparentDisplay for UsernameTag {};
-///
-/// format!("{}", Username::new("admin".into()));
-/// ```
-pub trait TransparentDisplay {}
-
 impl<V, T> std::fmt::Display for TaggedType<V, T>
 where
     V: std::fmt::Display,
@@ -186,19 +199,6 @@ where
         self.v.fmt(f)
     }
 }
-
-/// Enables parsing of TaggedType to be parsed from string.
-///
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, TransparentFromStr};
-/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
-/// pub enum DefaultGatewayTag {}
-/// impl TransparentFromStr for DefaultGatewayTag {};
-///
-/// let default_gw: DefaultGateway = "192.168.0.1".parse().unwrap();
-/// ```
-pub trait TransparentFromStr {}
 
 impl<V, T> std::str::FromStr for TaggedType<V, T>
 where
@@ -214,20 +214,6 @@ where
     }
 }
 
-/// Gives possibility to convert from inner type to the tagged type using From/Into.
-///
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, TransparentFromInner};
-/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
-/// pub enum DefaultGatewayTag {}
-/// impl TransparentFromInner for DefaultGatewayTag {};
-///
-/// let ip: std::net::IpAddr = "192.168.0.1".parse().unwrap();
-/// let default_gw: DefaultGateway = ip.into();
-/// ```
-pub trait TransparentFromInner {}
-
 impl<V, T> From<V> for TaggedType<V, T>
 where
     T: TransparentFromInner,
@@ -239,9 +225,6 @@ where
         }
     }
 }
-
-#[cfg(feature = "serde_support")]
-pub trait TransparentSerialize {}
 
 #[cfg(feature = "serde_support")]
 impl<V, T> serde::Serialize for TaggedType<V, T>
@@ -256,9 +239,6 @@ where
         self.v.serialize(serializer)
     }
 }
-
-#[cfg(feature = "serde_support")]
-pub trait TransparentDeserialize {}
 
 #[cfg(feature = "serde_support")]
 impl<'de, V, T> serde::Deserialize<'de> for TaggedType<V, T>
@@ -284,6 +264,7 @@ mod tests {
     fn test_deref() {
         enum UrlStringTag {}
         type UrlString = TaggedString<UrlStringTag>;
+        impl ImplementDeref for UrlStringTag {}
         let url = UrlString::new(URL.into());
         assert_eq!(url.to_string(), URL);
         assert!(url.contains("http"));
@@ -294,6 +275,8 @@ mod tests {
     fn test_default() {
         enum CounterU64Tag {}
         type CounterU64 = TaggedType<u64, CounterU64Tag>;
+        impl InnerAccess for CounterU64Tag {}
+        impl ImplementDefault for CounterU64Tag {}
         let c = CounterU64::default();
         assert_eq!(*c.inner(), 0);
     }
@@ -302,7 +285,11 @@ mod tests {
     fn test_copy() {
         enum CounterU64Tag {}
         type CounterU64 = TaggedType<u64, CounterU64Tag>;
+        impl ImplementCopy for CounterU64Tag {}
+        impl ImplementClone for CounterU64Tag {}
         impl TransparentDebug for CounterU64Tag {}
+        impl ImplementDefault for CounterU64Tag {}
+        impl ImplementPartialEq for CounterU64Tag {}
         let c = CounterU64::default();
         let v = c;
         assert_eq!(v, c);
@@ -313,6 +300,8 @@ mod tests {
         enum UsernameTag {}
         type Username = TaggedType<String, UsernameTag>;
         impl TransparentDebug for UsernameTag {}
+        impl ImplementPartialEq for UsernameTag {}
+        impl ImplementClone for UsernameTag {}
         let c = Username::new("admin".into());
         let v = c.clone();
         assert_eq!(v, c);
@@ -340,6 +329,7 @@ mod tests {
     fn test_transparent_from_str() {
         type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
         enum DefaultGatewayTag {}
+        impl InnerAccess for DefaultGatewayTag {}
         impl TransparentFromStr for DefaultGatewayTag {}
         const IP: &str = "192.168.0.1";
         let gw: DefaultGateway = IP.parse().unwrap();

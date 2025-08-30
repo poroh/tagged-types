@@ -25,17 +25,15 @@ Let:
 - `V` is the value type
 - `T` is the tag type
 
-Always implemented traits:
-- `Deref` is implemented, so all methods of `V` are available on
-  `TaggedType<V, T>`.
-
 Conditionally implemented traits when the trait is implemented by the underlying type `V`:
-- `Clone`
-- `Copy`
-- `Hash`
-- `PartialEq`
-- `Eq`
-- `Default`
+- `Deref` is implemented if `ImplementDeref` is implemeted for `T`, so all methods of `V` are available on
+  `TaggedType<V, T>`.
+- `Clone` if `ImplementClone` is implemented for `T`
+- `Copy` if `ImplementCopy` is implemented for `T`
+- `Hash` if `ImplementHash` is implemented for `T`
+- `PartialEq` if `ImplementParitalEq` is implemented for `T`
+- `Eq` if `ImplementEq` is implemented for `T`
+- `Default` if `ImplementDefault` is implemented for `T`
 
 Conditionally implemented traits when the trait is implemented by the underlying
 type `V` and enabled for the tag type `T`:
@@ -46,12 +44,17 @@ type `V` and enabled for the tag type `T`:
 - `FromStr` if `T` implements `TransparentFromStr`. In this case,
   `FromStr` parses the same as `V`
 
-Conditional feature support:
+## Conditional feature support
 
-### Feature `serde_support`:
+### Feature `serde_support`
 
 Conditionally implemented traits when implemented by the underlying type
 `V`:
 - `Serialize`
 - `Deserialize`
+
+### Feature `use_permissive`
+
+Provides `Permissive` trait that automatically implements all
+defined traits for `T` type.
 
