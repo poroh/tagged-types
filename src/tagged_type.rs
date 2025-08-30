@@ -2,6 +2,67 @@
 
 use std::marker::PhantomData;
 
+///
+/// Example for a password type:
+/// ```rust
+/// use tagged_types::TaggedType;
+/// pub type Password = TaggedType<String, PasswordTag>;
+/// pub enum PasswordTag {}
+///
+/// let password = Password::new("my-secret".into());
+/// ```
+///
+/// Cannot assign to the base type:
+/// ```rust,compile_fail
+/// use tagged_types::TaggedType;
+/// pub type Password = TaggedType<String, PasswordTag>;
+/// pub enum PasswordTag {}
+///
+/// let password = Password::new("supersecret".into());
+/// let copy: String = password; // does not compile: expected String
+/// ```
+///
+/// Cannot assign between types with different tags:
+/// ```rust,compile_fail
+/// use tagged_types::TaggedType;
+/// pub type Password = TaggedType<String, PasswordTag>;
+/// pub enum PasswordTag {}
+///
+/// use tagged_types::TaggedType;
+/// pub type Username = TaggedType<String, UsernameTag>;
+/// pub enum UsernameTag {}
+///
+/// let password = Password::new("my-secret".into());
+/// fn foo(user: &Username, password: &Password) {
+///    todo!();
+/// }
+///
+/// // Does not compile: invalid order of arguments:
+/// foo(&Password::new("supersecret".into()), &Username::new("admin".into()))
+/// ```
+///
+/// The Display and Debug traits are implemented only when TransparentDisplay / TransparentDebug are implemented:
+/// ```rust,compile_fail
+/// use tagged_types::TaggedType;
+/// pub type Password = TaggedType<String, PasswordTag>;
+/// pub enum PasswordTag {}
+///
+/// let password = Password::new("my-secret".into());
+/// format!("{}", password); // does not compile because TransparentDisplay is not implemented
+/// format!("{:?}", password); // does not compile because TransparentDebug is not implemented
+/// ```
+///
+/// The Display and Debug traits are implemented only when TransparentDisplay / TransparentDebug are implemented:
+/// ```rust
+/// use tagged_types::{TaggedType, TransparentDebug, TransparentDisplay};
+/// pub type Username = TaggedType<String, UsernameTag>;
+/// pub enum UsernameTag {}
+/// impl TransparentDebug for UsernameTag {};
+/// impl TransparentDisplay for UsernameTag {};
+///
+/// format!("{:?}", Username::new("admin".into()));
+/// format!("{}", Username::new("admin".into()));
+/// ```
 pub struct TaggedType<Value, Tag> {
     v: Value,
     _marker: std::marker::PhantomData<Tag>,
@@ -122,13 +183,13 @@ where
 }
 
 #[cfg(feature = "serde_support")]
-pub trait TransparentSerde {}
+pub trait TransparentSerialize {}
 
 #[cfg(feature = "serde_support")]
 impl<V, T> serde::Serialize for TaggedType<V, T>
 where
     V: serde::Serialize,
-    T: TransparentSerde,
+    T: TransparentSerialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -139,10 +200,13 @@ where
 }
 
 #[cfg(feature = "serde_support")]
+pub trait TransparentDeserialize {}
+
+#[cfg(feature = "serde_support")]
 impl<'de, V, T> serde::Deserialize<'de> for TaggedType<V, T>
 where
     V: serde::Deserialize<'de>,
-    T: TransparentSerde,
+    T: TransparentDeserialize,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where

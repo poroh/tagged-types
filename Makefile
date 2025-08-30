@@ -2,3 +2,5 @@
 
 all:
 	cargo test
+	cargo clippy
+
