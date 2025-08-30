@@ -12,11 +12,11 @@ use crate::TransparentDebug;
 use crate::TransparentDisplay;
 use crate::TransparentFromInner;
 use crate::TransparentFromStr;
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "support_serde")]
 use crate::TransparentDeserialize;
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "support_serde")]
 use crate::TransparentSerialize;
 
 /// Example for a password type:
@@ -57,7 +57,7 @@ use crate::TransparentSerialize;
 /// foo(&Password::new("supersecret".into()), &Username::new("admin".into()))
 /// ```
 ///
-/// The Display and Debug traits are implemented only when TransparentDisplay / TransparentDebug are implemented:
+/// The Display and Debug traits are implemented only when `TransparentDisplay` / `TransparentDebug` are implemented:
 /// ```rust,compile_fail
 /// use tagged_types::TaggedType;
 /// pub type Password = TaggedType<String, PasswordTag>;
@@ -68,7 +68,7 @@ use crate::TransparentSerialize;
 /// format!("{:?}", password); // does not compile because TransparentDebug is not implemented
 /// ```
 ///
-/// The Display and Debug traits are implemented only when TransparentDisplay / TransparentDebug are implemented:
+/// The Display and Debug traits are implemented only when `TransparentDisplay` / `TransparentDebug` are implemented:
 /// ```rust
 /// use tagged_types::{TaggedType, TransparentDebug, TransparentDisplay};
 /// pub type Username = TaggedType<String, UsernameTag>;
@@ -81,11 +81,12 @@ use crate::TransparentSerialize;
 /// ```
 pub struct TaggedType<Value, Tag> {
     v: Value,
-    _marker: std::marker::PhantomData<Tag>,
+    _marker: PhantomData<Tag>,
 }
 
 impl<V, T> TaggedType<V, T> {
-    pub fn new(v: V) -> Self {
+    #[inline]
+    pub const fn new(v: V) -> Self {
         Self {
             v,
             _marker: PhantomData,
@@ -97,7 +98,7 @@ impl<V, T> TaggedType<V, T>
 where
     T: InnerAccess,
 {
-    pub fn inner(&self) -> &V {
+    pub const fn inner(&self) -> &V {
         &self.v
     }
 
@@ -226,7 +227,7 @@ where
     }
 }
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "support_serde")]
 impl<V, T> serde::Serialize for TaggedType<V, T>
 where
     V: serde::Serialize,
@@ -240,7 +241,7 @@ where
     }
 }
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "support_serde")]
 impl<'de, V, T> serde::Deserialize<'de> for TaggedType<V, T>
 where
     V: serde::Deserialize<'de>,
@@ -250,7 +251,7 @@ where
     where
         D: serde::Deserializer<'de>,
     {
-        V::deserialize(deserializer).map(TaggedType::new)
+        V::deserialize(deserializer).map(Self::new)
     }
 }
 

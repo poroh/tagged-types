@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-/// Enables TaggedType to implement access to inner data
+#[cfg(feature = "support_serde")]
+pub mod serde;
+
+#[cfg(feature = "provide_permissive")]
+pub mod permissive;
+
+/// Enables `TaggedType` to implement access to inner data
 ///
 /// Example:
 /// ```rust
@@ -14,7 +20,7 @@
 /// ```
 pub trait InnerAccess {}
 
-/// Enables TaggedType to implement Deref to inner data
+/// Enables `TaggedType` to implement Deref to inner data
 ///
 /// Example:
 /// ```rust
@@ -28,8 +34,8 @@ pub trait InnerAccess {}
 /// ```
 pub trait ImplementDeref {}
 
-/// Enables TaggedType to implement Eq if inner type
-/// implements PartialEq.
+/// Enables `TaggedType` to implement Eq if inner type
+/// implements `PartialEq`.
 ///
 /// Example:
 /// ```rust
@@ -44,7 +50,7 @@ pub trait ImplementDeref {}
 /// ```
 pub trait ImplementPartialEq {}
 
-/// Enables TaggedType to implement Eq if inner type
+/// Enables `TaggedType` to implement `Eq` if inner type
 /// implements Eq.
 ///
 /// Example:
@@ -61,8 +67,8 @@ pub trait ImplementPartialEq {}
 /// ```
 pub trait ImplementEq {}
 
-/// Enables TaggedType to implement Default if inner type
-/// implements Default.
+/// Enables `TaggedType` to implement `Default` if inner type
+/// implements `Default`.
 ///
 /// Example:
 /// ```rust
@@ -74,7 +80,7 @@ pub trait ImplementEq {}
 /// ```
 pub trait ImplementDefault {}
 
-/// Enables TaggedType to implement std::fmt::Display trait
+/// Enables `TaggedType` to implement `std::fmt::Display` trait
 ///
 /// Example:
 /// ```rust
@@ -87,7 +93,7 @@ pub trait ImplementDefault {}
 /// ```
 pub trait TransparentDebug {}
 
-/// Enables TaggedType to implement std::fmt::Display trait
+/// Enables `TaggedType` to implement `std::fmt::Display` trait
 ///
 /// Example:
 /// ```rust
@@ -100,8 +106,8 @@ pub trait TransparentDebug {}
 /// ```
 pub trait TransparentDisplay {}
 
-/// Enables TaggedType to implement Clone trait if inner
-/// type implements Clone.
+/// Enables `TaggedType` to implement `Clone` trait if inner
+/// type implements `Clone`.
 ///
 /// Example:
 /// ```rust
@@ -117,8 +123,8 @@ pub trait TransparentDisplay {}
 /// ```
 pub trait ImplementClone {}
 
-/// Enables TaggedType to implement Copy trait if inner
-/// type implements Copy.
+/// Enables `TaggedType` to implement `Copy` trait if inner
+/// type implements `Copy`.
 ///
 /// Example:
 /// ```rust
@@ -135,8 +141,8 @@ pub trait ImplementClone {}
 /// ```
 pub trait ImplementCopy {}
 
-/// Enables TaggedType to implement Hash trait if inner
-/// type implements Hash.
+/// Enables `TaggedType` to implement `Hash` trait if inner
+/// type implements `Hash`.
 ///
 /// Example:
 /// ```rust
@@ -153,7 +159,7 @@ pub trait ImplementCopy {}
 /// ```
 pub trait ImplementHash {}
 
-/// Enables parsing of TaggedType to be parsed from string.
+/// Enables parsing of `TaggedType` to be parsed from string.
 ///
 /// Example:
 /// ```rust
@@ -179,95 +185,3 @@ pub trait TransparentFromStr {}
 /// let default_gw: DefaultGateway = ip.into();
 /// ```
 pub trait TransparentFromInner {}
-
-/// Transparent serde serialize if inner type implemnts
-/// serde serialization.
-///
-#[cfg(feature = "serde_support")]
-pub trait TransparentSerialize {}
-
-/// Transparent serde serialize if inner type implemnts
-/// serde serialization.
-///
-#[cfg(feature = "serde_support")]
-pub trait TransparentDeserialize {}
-
-/// Helper that gives all traits.
-///
-/// Automatically implements all traits if Tag implements Permissive
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, Permissive};
-/// use std::collections::HashSet;
-/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
-/// pub enum DefaultGatewayTag {}
-/// impl Permissive for DefaultGatewayTag {};
-///
-/// // Supports parsing from string
-/// let default_gw: DefaultGateway = "192.168.0.1".parse().unwrap();
-///
-/// // Supports: Display / Debug:
-/// format!("{default_gw}, {default_gw:?}");
-///
-/// // Supports: Deref to inner type:
-/// format!("{}", default_gw.is_ipv4());
-///
-/// // Supports: Hashing:
-/// let mut gateways = HashSet::new();
-/// gateways.insert(default_gw);
-///
-/// // Supports cration from inner type:
-/// let another_gw_ip: std::net::IpAddr = "192.168.0.1".parse().unwrap();
-/// let another_gw: DefaultGateway = another_gw_ip.into();
-///
-/// // Supports access / moving to inner type:
-/// format!("{}", another_gw.inner());
-/// let another_gw_ip: std::net::IpAddr = another_gw.into_inner();
-///
-/// ```
-#[cfg(feature = "use_permissive")]
-pub trait Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> InnerAccess for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementDeref for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementCopy for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementClone for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementDefault for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementPartialEq for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementEq for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> ImplementHash for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> TransparentDebug for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> TransparentDisplay for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> TransparentFromInner for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-impl<T> TransparentFromStr for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-#[cfg(feature = "serde_support")]
-impl<T> TransparentSerialize for T where T: Permissive {}
-
-#[cfg(feature = "use_permissive")]
-#[cfg(feature = "serde_support")]
-impl<T> TransparentDeserialize for T where T: Permissive {}

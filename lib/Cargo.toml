@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "tagged-types"
+description = "Define strongly typed wrappers over base types with minimal boilerplate"
+documentation.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+serde = { version = "1.0", features = [], optional = true }
+tagged-types-derive = { path = "../derive", optional = true }
+
+[features]
+default = [ "full" ]
+support_serde = [ "serde" ]
+provide_derive = [ "tagged-types-derive" ]
+provide_permissive = []
+
+empty = []
+
+full = [
+    "support_serde",
+    "provide_permissive",
+    "provide_derive"
+]

@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: MIT
+#
+
+[package]
+name = "tagged-types-derive"
+description = "Define derive procmacro for tagged types"
+documentation.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2", features = ["full"] }
+quote = { version = "1" }
+proc-macro2 = { version = "1" }
+

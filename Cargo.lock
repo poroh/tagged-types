@@ -56,6 +56,16 @@ name = "tagged-types"
 version = "0.2.0"
 dependencies = [
  "serde",
+ "tagged-types-derive",
+]
+
+[[package]]
+name = "tagged-types-derive"
+version = "0.2.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

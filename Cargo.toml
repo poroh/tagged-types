@@ -1,25 +1,19 @@
 # SPDX-License-Identifier: MIT
-#
 
-[package]
-name = "tagged-types"
+
+[workspace]
+members = [
+   "lib",
+   "derive"
+]
+
+[workspace.package]
 version = "0.2.0"
 license = "MIT"
-description = "Define strongly typed wrappers over base types with minimal boilerplate"
 repository = "https://github.com/poroh/tagged-types"
 readme = "README.md"
-documentation = "https://docs.rs/tagged-types"
+edition = "2018"
 keywords = ["rust", "types"]
 categories = ["data-structures"]
-
-[dependencies]
-serde = { version = "1.0", features = [], optional = true }
-
-[features]
-default = [ "full" ]
-serde_support = ["serde"]
-use_permissive = []
-
-empty = []
-full = ["serde_support", "use_permissive"]
+documentation = "https://docs.rs/tagged-types"
 
