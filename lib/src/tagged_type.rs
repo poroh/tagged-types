@@ -4,15 +4,15 @@ use crate::ImplementClone;
 use crate::ImplementCopy;
 use crate::ImplementDefault;
 use crate::ImplementDeref;
-use crate::ImplementEq;
 use crate::ImplementHash;
-use crate::ImplementPartialEq;
 use crate::InnerAccess;
 use crate::TransparentDebug;
 use crate::TransparentDisplay;
 use crate::TransparentFromInner;
 use crate::TransparentFromStr;
 use core::marker::PhantomData;
+
+pub mod cmp;
 
 #[cfg(feature = "support_serde")]
 pub mod serde;
@@ -149,23 +149,6 @@ where
     }
 }
 
-impl<V, T> PartialEq for TaggedType<V, T>
-where
-    V: PartialEq,
-    T: ImplementPartialEq,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.v.eq(&other.v)
-    }
-}
-
-impl<V, T> Eq for TaggedType<V, T>
-where
-    V: Eq,
-    T: ImplementEq + ImplementPartialEq,
-{
-}
-
 impl<V, T> Default for TaggedType<V, T>
 where
     V: Default,
@@ -227,7 +210,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::*;
     type TaggedString<T> = TaggedType<String, T>;
     const URL: &str = "http://example.com";
 

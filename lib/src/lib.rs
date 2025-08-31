@@ -11,7 +11,9 @@ pub use traits::ImplementDefault;
 pub use traits::ImplementDeref;
 pub use traits::ImplementEq;
 pub use traits::ImplementHash;
+pub use traits::ImplementOrd;
 pub use traits::ImplementPartialEq;
+pub use traits::ImplementPartialOrd;
 pub use traits::InnerAccess;
 pub use traits::TransparentDebug;
 pub use traits::TransparentDisplay;
@@ -40,7 +42,7 @@ mod tests {
     fn test_derive_all() {
         type CounterU64 = TaggedType<u64, CounterU64Tag>;
         #[derive(Tag)]
-        #[implement(Default, Eq, PartialEq, Hash, Clone, Copy)]
+        #[implement(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
         #[transparent(Debug, Display, FromStr)]
         #[capability(inner_access)]
         enum CounterU64Tag {}

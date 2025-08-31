@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: MIT
 
+pub mod cmp;
+#[cfg(feature = "provide_permissive")]
+pub mod permissive;
 #[cfg(feature = "support_serde")]
 pub mod serde;
 
-#[cfg(feature = "provide_permissive")]
-pub mod permissive;
+pub use cmp::ImplementEq;
+pub use cmp::ImplementOrd;
+pub use cmp::ImplementPartialEq;
+pub use cmp::ImplementPartialOrd;
 
 /// Enables `TaggedType` to implement access to inner data
 ///
@@ -33,39 +38,6 @@ pub trait InnerAccess {}
 /// format!("{}", Username::new("admin".into()).into_inner());
 /// ```
 pub trait ImplementDeref {}
-
-/// Enables `TaggedType` to implement Eq if inner type
-/// implements `PartialEq`.
-///
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, ImplementPartialEq};
-/// pub type Username = TaggedType<String, UsernameTag>;
-/// pub enum UsernameTag {}
-/// impl ImplementPartialEq for UsernameTag {};
-/// let admin = Username::new("admin".into());
-/// let root = Username::new("root".into());
-///
-/// format!("{:?}", admin != root);
-/// ```
-pub trait ImplementPartialEq {}
-
-/// Enables `TaggedType` to implement `Eq` if inner type
-/// implements Eq.
-///
-/// Example:
-/// ```rust
-/// use tagged_types::{TaggedType, ImplementEq, ImplementPartialEq};
-/// pub type Username = TaggedType<String, UsernameTag>;
-/// pub enum UsernameTag {}
-/// impl ImplementPartialEq for UsernameTag {};
-/// impl ImplementEq for UsernameTag {};
-/// let admin = Username::new("admin".into());
-/// let root = Username::new("root".into());
-///
-/// format!("{:?}", admin != root);
-/// ```
-pub trait ImplementEq {}
 
 /// Enables `TaggedType` to implement `Default` if inner type
 /// implements `Default`.

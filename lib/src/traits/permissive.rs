@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 
+use crate::traits::cmp::ImplementEq;
+use crate::traits::cmp::ImplementOrd;
+use crate::traits::cmp::ImplementPartialEq;
+use crate::traits::cmp::ImplementPartialOrd;
 use crate::traits::ImplementClone;
 use crate::traits::ImplementCopy;
 use crate::traits::ImplementDefault;
 use crate::traits::ImplementDeref;
-use crate::traits::ImplementEq;
 use crate::traits::ImplementHash;
-use crate::traits::ImplementPartialEq;
 use crate::traits::InnerAccess;
 use crate::traits::TransparentDebug;
 use crate::traits::TransparentDisplay;
@@ -60,6 +62,8 @@ impl<T> ImplementClone for T where T: Permissive {}
 impl<T> ImplementDefault for T where T: Permissive {}
 impl<T> ImplementPartialEq for T where T: Permissive {}
 impl<T> ImplementEq for T where T: Permissive {}
+impl<T> ImplementPartialOrd for T where T: Permissive {}
+impl<T> ImplementOrd for T where T: Permissive {}
 impl<T> ImplementHash for T where T: Permissive {}
 impl<T> TransparentDebug for T where T: Permissive {}
 impl<T> TransparentDisplay for T where T: Permissive {}
