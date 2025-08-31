@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use quote::quote;
 use syn::DeriveInput;
 
@@ -33,8 +34,9 @@ fn handle_permissive(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) -
             });
         } else {
             let name = &derive.ident;
+            let tt = crate_path();
             out.extend(quote! {
-                impl Permissive for #name {}
+                impl #tt::Permissive for #name {}
             });
         }
         true
@@ -44,11 +46,12 @@ fn handle_permissive(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) -
 fn handle_capability(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
     if let Some(impl_attr) = find_attr(derive, "capability") {
         let name = &derive.ident;
+        let tt = crate_path();
         match impl_attr.parse_nested_meta(|meta| {
             match meta.path.require_ident()?.to_string().as_str() {
                 "inner_access" => {
                     out.extend(quote! {
-                        impl InnerAccess for #name {}
+                        impl #tt::InnerAccess for #name {}
                     });
                     Ok(())
                 }
@@ -64,12 +67,13 @@ fn handle_capability(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
 fn handle_implement(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
     if let Some(impl_attr) = find_attr(derive, "implement") {
         let name = &derive.ident;
+        let tt = crate_path();
         match impl_attr.parse_nested_meta(|meta| {
             match meta.path.require_ident()?.to_string().as_str() {
                 s @ ("Default" | "Clone" | "Copy" | "PartialEq" | "Eq" | "Hash" | "Deref") => {
                     let trait_name = quote::format_ident!("Implement{s}");
                     out.extend(quote! {
-                        impl #trait_name for #name {}
+                        impl #tt::#trait_name for #name {}
                     });
                     Ok(())
                 }
@@ -84,13 +88,14 @@ fn handle_implement(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
 
 fn handle_transparent(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
     let name = &derive.ident;
+    let tt = crate_path();
     if let Some(impl_attr) = find_attr(derive, "transparent") {
         match impl_attr.parse_nested_meta(|meta| {
             match meta.path.require_ident()?.to_string().as_str() {
                 s @ ("Display" | "Debug" | "FromStr" | "Serialize" | "Deserialize") => {
                     let trait_name = quote::format_ident!("Transparent{s}");
                     out.extend(quote! {
-                        impl #trait_name for #name {}
+                        impl #tt::#trait_name for #name {}
                     });
                     Ok(())
                 }
@@ -100,5 +105,20 @@ fn handle_transparent(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) 
             Ok(()) => (),
             Err(e) => out.extend(e.into_compile_error()),
         }
+    }
+}
+
+fn crate_path() -> syn::Path {
+    use proc_macro_crate::{crate_name, FoundCrate};
+    match crate_name("tagged-types") {
+        // The macro is used *inside* the tagged-types crate
+        Ok(FoundCrate::Itself) => syn::parse_quote!(crate),
+        // The user may have renamed the dependency in Cargo.toml
+        Ok(FoundCrate::Name(name)) => {
+            let ident = syn::Ident::new(&name, Span::call_site());
+            syn::parse_quote!(::#ident)
+        }
+        // Fallback (shouldn’t normally happen)
+        Err(_) => syn::parse_quote!(::tagged_types),
     }
 }
