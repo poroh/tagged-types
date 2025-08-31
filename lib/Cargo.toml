@@ -26,8 +26,6 @@ support_serde = [ "serde" ]
 provide_derive = [ "tagged-types-derive" ]
 provide_permissive = []
 
-empty = []
-
 full = [
     "support_serde",
     "provide_permissive",
