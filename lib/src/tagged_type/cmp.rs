@@ -5,28 +5,19 @@ use crate::ImplementOrd;
 use crate::ImplementPartialEq;
 use crate::ImplementPartialOrd;
 use crate::TaggedType;
-use std::cmp::Ordering;
+use core::cmp::Ordering;
 
-impl<V, T> PartialEq for TaggedType<V, T>
-where
-    V: PartialEq,
-    T: ImplementPartialEq,
-{
+impl<V: PartialEq, T: ImplementPartialEq> PartialEq for TaggedType<V, T> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.v.eq(&other.v)
     }
 }
 
-impl<V, T> Eq for TaggedType<V, T>
-where
-    V: Eq,
-    T: ImplementEq + ImplementPartialEq,
-{
-}
+impl<V: Eq, T> Eq for TaggedType<V, T> where T: ImplementEq + ImplementPartialEq {}
 
-impl<V, T> PartialOrd for TaggedType<V, T>
+impl<V: PartialOrd, T> PartialOrd for TaggedType<V, T>
 where
-    V: PartialOrd,
     T: ImplementPartialOrd + ImplementPartialEq,
 {
     #[inline]
@@ -35,9 +26,8 @@ where
     }
 }
 
-impl<V, T> Ord for TaggedType<V, T>
+impl<V: Ord, T> Ord for TaggedType<V, T>
 where
-    V: Ord,
     T: ImplementOrd + ImplementPartialOrd + ImplementPartialEq + ImplementEq,
 {
     #[inline]

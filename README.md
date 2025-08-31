@@ -96,7 +96,7 @@ enum FirmwareVersionTag {}
 
 This library is designed to depend only on the standard library.
 Optionally, it supports serialization and deserialization for the underlying type
-(see the `serde_support` feature).
+(see the `support_serde` feature).
 
 # TaggedType
 

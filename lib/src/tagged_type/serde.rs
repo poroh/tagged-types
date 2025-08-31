@@ -3,29 +3,23 @@
 use crate::TaggedType;
 use crate::TransparentDeserialize;
 use crate::TransparentSerialize;
+use serde::Deserialize;
+use serde::Deserializer;
+use serde::Serialize;
+use serde::Serializer;
 
-impl<V, T> serde::Serialize for TaggedType<V, T>
-where
-    V: serde::Serialize,
-    T: TransparentSerialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
+impl<V: Serialize, T: TransparentSerialize> Serialize for TaggedType<V, T> {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         self.v.serialize(serializer)
     }
 }
 
-impl<'de, V, T> serde::Deserialize<'de> for TaggedType<V, T>
-where
-    V: serde::Deserialize<'de>,
-    T: TransparentDeserialize,
+impl<'de, V: Deserialize<'de>, T: TransparentDeserialize> serde::Deserialize<'de>
+    for TaggedType<V, T>
 {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
+    #[inline]
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         V::deserialize(deserializer).map(Self::new)
     }
 }

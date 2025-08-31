@@ -1,10 +1,74 @@
 // SPDX-License-Identifier: MIT
 
+#![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+
+//! tagged-types-derive provides derive macro for a Tag types
+//!
+//! To enable impementions on `TaggedType` it expects implementation
+//! of traits for Tag type. This crates give possibility of implementation
+//! of the traits using derive syntax.
+//!
+//! Example with all defined attributes:
+//! ```rust
+//! use tagged_types::TaggedType;
+//! type Host = TaggedType<String, HostTag>;
+//! #[derive(tagged_types_derive::Tag)]
+//! #[implement(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+//! #[transparent(Debug, Display, FromStr)]
+//! #[capability(inner_access, from_inner)]
+//! enum HostTag {}
+//!
+//! let host = Host::default();
+//! ```
+//!
+//! Alternative, using permissive attribute:
+//! ```rust
+//! use tagged_types::TaggedType;
+//! type Host = TaggedType<String, HostTag>;
+//! #[derive(tagged_types_derive::Tag)]
+//! #[permissive]
+//! enum HostTag {}
+//!
+//! let host = Host::default();
+//! ```
+
+#![deny(missing_docs)]
+
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
 use syn::DeriveInput;
 
+/// # Attributes
+///
+/// - `#[implement(...)]`\
+///   List **individual traits** to implement.
+///   Supported:
+///    - `Default`
+///    - `Clone`
+///    - `Copy`
+///    - `PartialEq`
+///    - `Eq`
+///    - `PartialOrd`
+///    - `Ord`
+///    - `Hash`
+///
+/// - `#[transparent]`\
+///   Transparent implementations as if no wrapper at all.
+///   Supported:
+///    - `Display`
+///    - `Debug`
+///    - `FromStr`
+///
+/// - `#[capability(...)]`\
+///   Enable additional capabilities for `TaggedType`.
+///   Supported:
+///   - `inner_access` provides `into_inner()` and `inner()` functions.
+///   - `from_inner` provides implmentation `From<Inner>` for `TaggedType<Inner, Tag>`.
+///
+/// - `#[permissive]`\
+///   Convenience mode that implents all supported capabilities, implentations and transparent
+///   implementations of traits.
 #[proc_macro_derive(Tag, attributes(implement, transparent, capability, permissive))]
 pub fn derive_tag(input: TokenStream) -> TokenStream {
     let derive = syn::parse_macro_input!(input as syn::DeriveInput);
@@ -52,6 +116,12 @@ fn handle_capability(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
                 "inner_access" => {
                     out.extend(quote! {
                         impl #tt::InnerAccess for #name {}
+                    });
+                    Ok(())
+                }
+                "from_inner" => {
+                    out.extend(quote! {
+                        impl #tt::FromInner for #name {}
                     });
                     Ok(())
                 }

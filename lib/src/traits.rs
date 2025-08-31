@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: MIT
 
+/// Define traits related to `core::cmp` traits.
 pub mod cmp;
+/// Defines Permissive trait if `provide_permissive` feature is
+/// defined.
 #[cfg(feature = "provide_permissive")]
 pub mod permissive;
+/// Defines serde-related traits if `support_serde` feature is
+/// defined.
 #[cfg(feature = "support_serde")]
 pub mod serde;
 
@@ -148,12 +153,17 @@ pub trait TransparentFromStr {}
 ///
 /// Example:
 /// ```rust
-/// use tagged_types::{TaggedType, TransparentFromInner};
+/// use tagged_types::{TaggedType, FromInner};
 /// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
 /// pub enum DefaultGatewayTag {}
-/// impl TransparentFromInner for DefaultGatewayTag {};
+/// impl FromInner for DefaultGatewayTag {};
 ///
 /// let ip: std::net::IpAddr = "192.168.0.1".parse().unwrap();
 /// let default_gw: DefaultGateway = ip.into();
 /// ```
+pub trait FromInner {}
+
+/// Backward compatible alias for `FromInner`.
 pub trait TransparentFromInner {}
+
+impl<T: TransparentFromInner> FromInner for T {}

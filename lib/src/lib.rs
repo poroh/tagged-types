@@ -1,10 +1,49 @@
 // SPDX-License-Identifier: MIT
 
-#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+//! tagged-types is a library that simplifies implementation of the [New type idiom](https://doc.rust-lang.org/rust-by-example/generics/new_types.html).
+//!
+//! In many cases, we want strict types, but we don't want to spend a
+//! lot of time implementing boilerplate around them (serialization/deserialization/parsing/clone/copy, etc.).
+//!
+//! This crate provides implementations for you. You can choose between
+//! two implementations:
+//! - Permissive, which provides automatic implementations of all supported traits.
+//! - Fine-grained, inheriting only the traits needed for your New type.
+//!
+//! Optionally, you can also use [`tagged-types-derive`] to further reduce the verbosity
+//! of the implementation.
 
+#![deny(
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo,
+    clippy::suspicious,
+    clippy::complexity,
+    clippy::perf
+)]
+#![deny(
+    clippy::absolute_paths,
+    clippy::todo,
+    clippy::unimplemented,
+    clippy::tests_outside_test_module,
+    clippy::std_instead_of_core,
+    clippy::std_instead_of_alloc,
+    clippy::panic,
+    clippy::unwrap_used,
+    clippy::unwrap_in_result,
+    clippy::unused_trait_names,
+    clippy::print_stdout,
+    clippy::print_stderr
+)]
+#![deny(missing_docs)]
+
+/// Definition of `TaggedType`.
 pub mod tagged_type;
+/// Definitions of crate's traits.
 pub mod traits;
 
+pub use traits::FromInner;
 pub use traits::ImplementClone;
 pub use traits::ImplementCopy;
 pub use traits::ImplementDefault;
@@ -28,6 +67,7 @@ pub use traits::serde::TransparentSerialize;
 #[cfg(feature = "provide_permissive")]
 pub use traits::permissive::Permissive;
 
+/// Export `TaggedType` from top level.
 pub type TaggedType<V, T> = tagged_type::TaggedType<V, T>;
 
 #[cfg(feature = "provide_derive")]

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+use crate::FromInner;
 use crate::ImplementClone;
 use crate::ImplementCopy;
 use crate::ImplementDefault;
@@ -8,12 +9,22 @@ use crate::ImplementHash;
 use crate::InnerAccess;
 use crate::TransparentDebug;
 use crate::TransparentDisplay;
-use crate::TransparentFromInner;
 use crate::TransparentFromStr;
+use core::fmt::Debug;
+use core::fmt::Display;
+use core::fmt::Formatter;
+use core::fmt::Result as FmtResult;
+use core::hash::Hash;
+use core::hash::Hasher;
 use core::marker::PhantomData;
+use core::ops::Deref;
+use core::str::FromStr;
 
+/// Implmentation of comparison traits for `TaggedType`.
 pub mod cmp;
 
+/// Implmentation of `serde::Serialize` and `serde::Deserialize` for
+/// `support_serde` feature.
 #[cfg(feature = "support_serde")]
 pub mod serde;
 
@@ -83,6 +94,7 @@ pub struct TaggedType<Value, Tag> {
 }
 
 impl<V, T> TaggedType<V, T> {
+    /// Create `TaggedType` from inner type.
     #[inline]
     pub const fn new(v: V) -> Self {
         Self {
@@ -92,35 +104,31 @@ impl<V, T> TaggedType<V, T> {
     }
 }
 
-impl<V, T> TaggedType<V, T>
-where
-    T: InnerAccess,
-{
+impl<V, T: InnerAccess> TaggedType<V, T> {
+    /// Provides reference to inner data.
+    #[inline]
     pub const fn inner(&self) -> &V {
         &self.v
     }
 
+    /// Convert `TaggedType` to inner data.
+    #[inline]
     pub fn into_inner(self) -> V {
         self.v
     }
 }
 
-impl<V, T> std::ops::Deref for TaggedType<V, T>
-where
-    T: ImplementDeref,
-{
+impl<V, T: ImplementDeref> Deref for TaggedType<V, T> {
     type Target = V;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.v
     }
 }
 
-impl<V, T> Clone for TaggedType<V, T>
-where
-    V: Clone,
-    T: ImplementClone,
-{
+impl<V: Clone, T: ImplementClone> Clone for TaggedType<V, T> {
+    #[inline]
     fn clone(&self) -> Self {
         Self {
             v: self.v.clone(),
@@ -129,31 +137,17 @@ where
     }
 }
 
-impl<V, T> Copy for TaggedType<V, T>
-where
-    V: Copy,
-    T: ImplementCopy + ImplementClone,
-{
-}
+impl<V: Copy, T: ImplementCopy + ImplementClone> Copy for TaggedType<V, T> {}
 
-impl<V, T> std::hash::Hash for TaggedType<V, T>
-where
-    V: std::hash::Hash,
-    T: ImplementHash,
-{
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: std::hash::Hasher,
-    {
+impl<V: Hash, T: ImplementHash> Hash for TaggedType<V, T> {
+    #[inline]
+    fn hash<H: Hasher>(&self, state: &mut H) {
         self.v.hash(state);
     }
 }
 
-impl<V, T> Default for TaggedType<V, T>
-where
-    V: Default,
-    T: ImplementDefault,
-{
+impl<V: Default, T: ImplementDefault> Default for TaggedType<V, T> {
+    #[inline]
     fn default() -> Self {
         Self {
             _marker: PhantomData,
@@ -162,32 +156,24 @@ where
     }
 }
 
-impl<V, T> std::fmt::Debug for TaggedType<V, T>
-where
-    V: std::fmt::Debug,
-    T: TransparentDebug,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<V: Debug, T: TransparentDebug> Debug for TaggedType<V, T> {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         self.v.fmt(f)
     }
 }
 
-impl<V, T> std::fmt::Display for TaggedType<V, T>
-where
-    V: std::fmt::Display,
-    T: TransparentDisplay,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<V: Display, T: TransparentDisplay> Display for TaggedType<V, T> {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         self.v.fmt(f)
     }
 }
 
-impl<V, T> std::str::FromStr for TaggedType<V, T>
-where
-    V: std::str::FromStr,
-    T: TransparentFromStr,
-{
-    type Err = <V as std::str::FromStr>::Err;
+impl<V: FromStr, T: TransparentFromStr> FromStr for TaggedType<V, T> {
+    type Err = <V as FromStr>::Err;
+
+    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self {
             v: V::from_str(s)?,
@@ -196,10 +182,8 @@ where
     }
 }
 
-impl<V, T> From<V> for TaggedType<V, T>
-where
-    T: TransparentFromInner,
-{
+impl<V, T: FromInner> From<V> for TaggedType<V, T> {
+    #[inline]
     fn from(v: V) -> Self {
         Self {
             v,
