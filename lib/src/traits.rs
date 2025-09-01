@@ -30,7 +30,30 @@ pub use cmp::ImplementPartialOrd;
 /// ```
 pub trait InnerAccess {}
 
-/// Enables `TaggedType` to implement Deref to inner data
+/// Enables `TaggedType` to implement `map` of inner data
+///
+/// This can be useful if Tag is used as braning mechanism
+/// while value type defines storage.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, InnerAccess, ValueMap};
+/// pub type Meters<T> = TaggedType<T, MetersTag>;
+/// pub enum MetersTag {}
+/// impl ValueMap for MetersTag {};
+/// impl InnerAccess for MetersTag {};
+///
+/// let distance = Meters::new(10);
+/// let distance = distance.map(|v| v as f64 + 0.5);
+/// println!("{}", distance.inner())
+///
+/// ```
+pub trait ValueMap {}
+
+/// Enables `TaggedType` to implement Deref to inner data.
+///
+/// Note that this is considered bad practice for tagged type
+/// to add Deref because of erasure of tag at call site.
 ///
 /// Example:
 /// ```rust

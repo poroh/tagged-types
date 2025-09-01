@@ -62,6 +62,7 @@ pub use traits::TransparentDebug;
 pub use traits::TransparentDisplay;
 pub use traits::TransparentFromInner;
 pub use traits::TransparentFromStr;
+pub use traits::ValueMap;
 
 #[cfg(feature = "support_serde")]
 pub use traits::serde::TransparentDeserialize;

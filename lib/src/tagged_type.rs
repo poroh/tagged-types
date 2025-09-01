@@ -14,6 +14,7 @@ use crate::InnerAccess;
 use crate::TransparentDebug;
 use crate::TransparentDisplay;
 use crate::TransparentFromStr;
+use crate::ValueMap;
 use core::fmt::Debug;
 use core::fmt::Display;
 use core::fmt::Formatter;
@@ -123,6 +124,30 @@ impl<V, T: InnerAccess> TaggedType<V, T> {
     #[inline]
     pub fn into_inner(self) -> V {
         self.v
+    }
+}
+
+impl<V, T: ValueMap> TaggedType<V, T> {
+    /// Converts inner type using function f.
+    #[inline]
+    pub fn map<F, U>(self, f: F) -> TaggedType<U, T>
+    where
+        F: FnOnce(V) -> U,
+    {
+        TaggedType::<U, T>::new(f(self.v))
+    }
+
+    /// Converts inner type using function f that returns Result.
+    ///
+    /// # Errors
+    ///
+    /// Will return E the same as Result of f.
+    #[inline]
+    pub fn try_map<F, U, E>(self, f: F) -> Result<TaggedType<U, T>, E>
+    where
+        F: FnOnce(V) -> Result<U, E>,
+    {
+        f(self.v).map(TaggedType::<U, T>::new)
     }
 }
 
