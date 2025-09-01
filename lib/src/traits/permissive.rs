@@ -4,11 +4,15 @@ use crate::traits::cmp::ImplementEq;
 use crate::traits::cmp::ImplementOrd;
 use crate::traits::cmp::ImplementPartialEq;
 use crate::traits::cmp::ImplementPartialOrd;
+use crate::traits::ImplementAdd;
 use crate::traits::ImplementClone;
 use crate::traits::ImplementCopy;
 use crate::traits::ImplementDefault;
 use crate::traits::ImplementDeref;
+use crate::traits::ImplementDiv;
 use crate::traits::ImplementHash;
+use crate::traits::ImplementMul;
+use crate::traits::ImplementSub;
 use crate::traits::InnerAccess;
 use crate::traits::TransparentDebug;
 use crate::traits::TransparentDisplay;
@@ -65,6 +69,10 @@ impl<T> ImplementEq for T where T: Permissive {}
 impl<T> ImplementPartialOrd for T where T: Permissive {}
 impl<T> ImplementOrd for T where T: Permissive {}
 impl<T> ImplementHash for T where T: Permissive {}
+impl<T> ImplementAdd for T where T: Permissive {}
+impl<T> ImplementSub for T where T: Permissive {}
+impl<T> ImplementMul for T where T: Permissive {}
+impl<T> ImplementDiv for T where T: Permissive {}
 impl<T> TransparentDebug for T where T: Permissive {}
 impl<T> TransparentDisplay for T where T: Permissive {}
 impl<T> TransparentFromInner for T where T: Permissive {}

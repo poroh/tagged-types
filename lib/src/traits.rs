@@ -167,3 +167,60 @@ pub trait FromInner {}
 pub trait TransparentFromInner {}
 
 impl<T: TransparentFromInner> FromInner for T {}
+
+/// Implement `std::ops::Add` trait for `TaggedType`.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, ImplementAdd};
+/// pub type CounterU64 = TaggedType<u64, CounterU64Tag>;
+/// pub enum CounterU64Tag {}
+/// impl ImplementAdd for CounterU64Tag {};
+///
+/// let counter = CounterU64::new(0);
+/// let one: CounterU64 = counter + 1;
+/// ```
+pub trait ImplementAdd {}
+
+/// Implement `std::ops::Sub` trait for `TaggedType`.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, ImplementSub, ImplementDefault};
+/// pub type Balance = TaggedType<i64, BalanceTag>;
+/// pub enum BalanceTag {}
+/// impl ImplementDefault for BalanceTag {};
+/// impl ImplementSub for BalanceTag {};
+///
+/// let balance = Balance::default();
+/// let credit: Balance = balance - 1;
+/// ```
+pub trait ImplementSub {}
+
+/// Implement `std::ops::Mul` trait for `TaggedType`.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, ImplementMul};
+/// pub type Capital = TaggedType<f64, CapitalTag>;
+/// pub enum CapitalTag {}
+/// impl ImplementMul for CapitalTag {};
+///
+/// let capital = Capital::new(100.0);
+/// let next_year_capital: Capital = capital * 1.05;
+/// ```
+pub trait ImplementMul {}
+
+/// Implement `std::ops::Div` trait for `TaggedType`.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, ImplementDiv, ImplementDefault};
+/// pub type Pie = TaggedType<f64, PieTag>;
+/// pub enum PieTag {}
+/// impl ImplementDiv for PieTag {};
+///
+/// let pie = Pie::new(5.0);
+/// let small_pie: Pie = pie / 5.0;
+/// ```
+pub trait ImplementDiv {}

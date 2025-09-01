@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: MIT
 
 use crate::FromInner;
+use crate::ImplementAdd;
 use crate::ImplementClone;
 use crate::ImplementCopy;
 use crate::ImplementDefault;
 use crate::ImplementDeref;
+use crate::ImplementDiv;
 use crate::ImplementHash;
+use crate::ImplementMul;
+use crate::ImplementSub;
 use crate::InnerAccess;
 use crate::TransparentDebug;
 use crate::TransparentDisplay;
@@ -17,7 +21,11 @@ use core::fmt::Result as FmtResult;
 use core::hash::Hash;
 use core::hash::Hasher;
 use core::marker::PhantomData;
+use core::ops::Add;
 use core::ops::Deref;
+use core::ops::Div;
+use core::ops::Mul;
+use core::ops::Sub;
 use core::str::FromStr;
 
 /// Implmentation of comparison traits for `TaggedType`.
@@ -187,6 +195,50 @@ impl<V, T: FromInner> From<V> for TaggedType<V, T> {
     fn from(v: V) -> Self {
         Self {
             v,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<Rhs, V: Add<Rhs, Output = V>, T: ImplementAdd> Add<Rhs> for TaggedType<V, T> {
+    type Output = Self;
+    #[inline]
+    fn add(self, v: Rhs) -> Self {
+        Self {
+            v: self.v + v,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<Rhs, V: Sub<Rhs, Output = V>, T: ImplementSub> Sub<Rhs> for TaggedType<V, T> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, v: Rhs) -> Self {
+        Self {
+            v: self.v - v,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<Rhs, V: Mul<Rhs, Output = V>, T: ImplementMul> Mul<Rhs> for TaggedType<V, T> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, v: Rhs) -> Self {
+        Self {
+            v: self.v * v,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<Rhs, V: Div<Rhs, Output = V>, T: ImplementDiv> Div<Rhs> for TaggedType<V, T> {
+    type Output = Self;
+    #[inline]
+    fn div(self, v: Rhs) -> Self {
+        Self {
+            v: self.v / v,
             _marker: PhantomData,
         }
     }

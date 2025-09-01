@@ -52,6 +52,10 @@ use syn::DeriveInput;
 ///    - `PartialOrd`
 ///    - `Ord`
 ///    - `Hash`
+///    - `Add`
+///    - `Sub`
+///    - `Mul`
+///    - `Div`
 ///
 /// - `#[transparent]`\
 ///   Transparent implementations as if no wrapper at all.
@@ -141,7 +145,7 @@ fn handle_implement(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
         match impl_attr.parse_nested_meta(|meta| {
             match meta.path.require_ident()?.to_string().as_str() {
                 s @ ("Default" | "Clone" | "Copy" | "PartialEq" | "Eq" | "PartialOrd" | "Ord"
-                | "Hash" | "Deref") => {
+                | "Hash" | "Deref" | "Add" | "Sub" | "Mul" | "Div") => {
                     let trait_name = quote::format_ident!("Implement{s}");
                     out.extend(quote! {
                         impl #tt::#trait_name for #name {}
