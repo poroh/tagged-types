@@ -247,6 +247,7 @@ impl<Rhs, V: Div<Rhs, Output = V>, T: ImplementDiv> Div<Rhs> for TaggedType<V, T
 #[cfg(test)]
 mod tests {
     use crate::*;
+    use core::net::IpAddr;
     type TaggedString<T> = TaggedType<String, T>;
     const URL: &str = "http://example.com";
 
@@ -317,12 +318,12 @@ mod tests {
 
     #[test]
     fn test_transparent_from_str() {
-        type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+        type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
         enum DefaultGatewayTag {}
         impl InnerAccess for DefaultGatewayTag {}
         impl TransparentFromStr for DefaultGatewayTag {}
         const IP: &str = "192.168.0.1";
         let gw: DefaultGateway = IP.parse().unwrap();
-        assert_eq!(gw.inner(), &IP.parse::<std::net::IpAddr>().unwrap());
+        assert_eq!(gw.inner(), &IP.parse::<IpAddr>().unwrap());
     }
 }

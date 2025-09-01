@@ -57,7 +57,7 @@ pub trait ImplementDeref {}
 /// ```
 pub trait ImplementDefault {}
 
-/// Enables `TaggedType` to implement `std::fmt::Display` trait
+/// Enables `TaggedType` to implement `core::fmt::Display` trait
 ///
 /// Example:
 /// ```rust
@@ -70,7 +70,7 @@ pub trait ImplementDefault {}
 /// ```
 pub trait TransparentDebug {}
 
-/// Enables `TaggedType` to implement `std::fmt::Display` trait
+/// Enables `TaggedType` to implement `core::fmt::Display` trait
 ///
 /// Example:
 /// ```rust
@@ -141,7 +141,8 @@ pub trait ImplementHash {}
 /// Example:
 /// ```rust
 /// use tagged_types::{TaggedType, TransparentFromStr};
-/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+/// use core::net::IpAddr;
+/// pub type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
 /// pub enum DefaultGatewayTag {}
 /// impl TransparentFromStr for DefaultGatewayTag {};
 ///
@@ -154,11 +155,12 @@ pub trait TransparentFromStr {}
 /// Example:
 /// ```rust
 /// use tagged_types::{TaggedType, FromInner};
-/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+/// use core::net::IpAddr;
+/// pub type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
 /// pub enum DefaultGatewayTag {}
 /// impl FromInner for DefaultGatewayTag {};
 ///
-/// let ip: std::net::IpAddr = "192.168.0.1".parse().unwrap();
+/// let ip: IpAddr = "192.168.0.1".parse().unwrap();
 /// let default_gw: DefaultGateway = ip.into();
 /// ```
 pub trait FromInner {}
@@ -168,7 +170,7 @@ pub trait TransparentFromInner {}
 
 impl<T: TransparentFromInner> FromInner for T {}
 
-/// Implement `std::ops::Add` trait for `TaggedType`.
+/// Implement `core::ops::Add` trait for `TaggedType`.
 ///
 /// Example:
 /// ```rust
@@ -182,7 +184,7 @@ impl<T: TransparentFromInner> FromInner for T {}
 /// ```
 pub trait ImplementAdd {}
 
-/// Implement `std::ops::Sub` trait for `TaggedType`.
+/// Implement `core::ops::Sub` trait for `TaggedType`.
 ///
 /// Example:
 /// ```rust
@@ -197,7 +199,7 @@ pub trait ImplementAdd {}
 /// ```
 pub trait ImplementSub {}
 
-/// Implement `std::ops::Mul` trait for `TaggedType`.
+/// Implement `core::ops::Mul` trait for `TaggedType`.
 ///
 /// Example:
 /// ```rust
@@ -211,7 +213,7 @@ pub trait ImplementSub {}
 /// ```
 pub trait ImplementMul {}
 
-/// Implement `std::ops::Div` trait for `TaggedType`.
+/// Implement `core::ops::Div` trait for `TaggedType`.
 ///
 /// Example:
 /// ```rust

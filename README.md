@@ -2,9 +2,10 @@
 
 ```rust
 use tagged_types::TaggedType;
+use core::net::IpAddr;
 
 // Introduce Gateway type that has IpAddr as base type.
-type Gateway = TaggedType<std::net::IpAddr, GatewayTag>;
+type Gateway = TaggedType<IpAddr, GatewayTag>;
 
 // Define all required properties that needed for type.
 #[derive(tagged_types::Tag)]
@@ -19,7 +20,7 @@ enum GatewayTag {}
 // #[permissive]
 // enum GatewayTag {}
 
-// Use type as if it is std::net::Ipaddr
+// Use type as if it is Ipaddr
 #[derive(serde::Serialize, serde::Deserialize)]
 struct Route {
     gateway: Gateway,
@@ -155,7 +156,7 @@ Provides `#[derive(tagged_type::Tag)]` which provide helpers to avoid
 manual implementation of traits. Example of all possible features:
 
 ```rust
-type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+type DefaultGateway = TaggedType<core::net::IpAddr, DefaultGatewayTag>;
 #[derive(Tag)]
 #[implement(Default, Eq, PartialEq, Hash, Clone, Copy)]
 #[transparent(Debug, Display, FromStr, Serialize, Deserialize)]

@@ -27,10 +27,11 @@ impl<'de, V: Deserialize<'de>, T: TransparentDeserialize> serde::Deserialize<'de
 #[cfg(test)]
 mod tests {
     use crate::*;
+    use core::net::IpAddr;
 
     #[test]
     fn test_serializer() {
-        type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+        type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
         enum DefaultGatewayTag {}
         impl TransparentSerialize for DefaultGatewayTag {}
         const IP: &str = "192.168.0.1";
@@ -40,7 +41,7 @@ mod tests {
 
     #[test]
     fn test_derializer() {
-        type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+        type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
         enum DefaultGatewayTag {}
         impl TransparentDeserialize for DefaultGatewayTag {}
         impl TransparentDebug for DefaultGatewayTag {}
@@ -62,7 +63,7 @@ mod tests {
     #[cfg(feature = "provide_derive")]
     #[test]
     fn test_serializer_deserializer_derive() {
-        type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+        type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
         #[derive(Tag)]
         #[transparent(Serialize, Deserialize, Debug)]
         #[implement(PartialEq, Clone, Copy)]

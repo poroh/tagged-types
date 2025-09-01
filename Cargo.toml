@@ -12,7 +12,7 @@ license = "MIT"
 repository = "https://github.com/poroh/tagged-types"
 readme = "README.md"
 edition = "2018"
-keywords = ["rust", "types"]
+keywords = ["rust", "types", "no_std"]
 categories = ["data-structures"]
 documentation = "https://docs.rs/tagged-types"
 

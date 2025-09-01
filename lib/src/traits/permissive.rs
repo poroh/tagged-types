@@ -31,7 +31,8 @@ use crate::traits::serde::TransparentSerialize;
 /// ```rust
 /// use tagged_types::{TaggedType, Permissive};
 /// use std::collections::HashSet;
-/// pub type DefaultGateway = TaggedType<std::net::IpAddr, DefaultGatewayTag>;
+/// use core::net::IpAddr;
+/// pub type DefaultGateway = TaggedType<IpAddr, DefaultGatewayTag>;
 /// pub enum DefaultGatewayTag {}
 /// impl Permissive for DefaultGatewayTag {};
 ///
@@ -49,12 +50,12 @@ use crate::traits::serde::TransparentSerialize;
 /// gateways.insert(default_gw);
 ///
 /// // Supports cration from inner type:
-/// let another_gw_ip: std::net::IpAddr = "192.168.0.1".parse().unwrap();
+/// let another_gw_ip: IpAddr = "192.168.0.1".parse().unwrap();
 /// let another_gw: DefaultGateway = another_gw_ip.into();
 ///
 /// // Supports access / moving to inner type:
 /// format!("{}", another_gw.inner());
-/// let another_gw_ip: std::net::IpAddr = another_gw.into_inner();
+/// let another_gw_ip: IpAddr = another_gw.into_inner();
 ///
 /// ```
 pub trait Permissive {}
