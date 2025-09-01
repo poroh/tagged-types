@@ -8,7 +8,6 @@ use crate::traits::ImplementAdd;
 use crate::traits::ImplementClone;
 use crate::traits::ImplementCopy;
 use crate::traits::ImplementDefault;
-use crate::traits::ImplementDeref;
 use crate::traits::ImplementDiv;
 use crate::traits::ImplementHash;
 use crate::traits::ImplementMul;
@@ -42,8 +41,8 @@ use crate::traits::serde::TransparentSerialize;
 /// // Supports: Display / Debug:
 /// format!("{default_gw}, {default_gw:?}");
 ///
-/// // Supports: Deref to inner type:
-/// format!("{}", default_gw.is_ipv4());
+/// // Supports: access to inner type:
+/// format!("{}", default_gw.inner().is_ipv4());
 ///
 /// // Supports: Hashing:
 /// let mut gateways = HashSet::new();
@@ -61,7 +60,6 @@ use crate::traits::serde::TransparentSerialize;
 pub trait Permissive {}
 
 impl<T> InnerAccess for T where T: Permissive {}
-impl<T> ImplementDeref for T where T: Permissive {}
 impl<T> ImplementCopy for T where T: Permissive {}
 impl<T> ImplementClone for T where T: Permissive {}
 impl<T> ImplementDefault for T where T: Permissive {}
