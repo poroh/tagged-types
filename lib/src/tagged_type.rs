@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+use crate::Cloned;
 use crate::FromInner;
 use crate::ImplementAdd;
 use crate::ImplementClone;
@@ -124,6 +125,15 @@ impl<V, T: InnerAccess> TaggedType<V, T> {
     #[inline]
     pub fn into_inner(self) -> V {
         self.v
+    }
+}
+
+impl<V: Clone, T: Cloned> TaggedType<&V, T> {
+    /// Transform to owning `TaggedType`.
+    #[inline]
+    #[must_use]
+    pub fn cloned(self) -> TaggedType<V, T> {
+        TaggedType::new(self.v.clone())
     }
 }
 

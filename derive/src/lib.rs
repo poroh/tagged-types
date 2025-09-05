@@ -69,6 +69,8 @@ use syn::DeriveInput;
 ///   Supported:
 ///   - `inner_access` provides `into_inner()` and `inner()` functions.
 ///   - `from_inner` provides implmentation `From<Inner>` for `TaggedType<Inner, Tag>`.
+///   - `value_map` provides `map(self, F)` and `try_map(self, F)` for `TaggedType<Inner, Tag>`.
+///   - `cloned` provides `cloned(self)` for `TaggedType<&Inner, Tag>`.
 ///
 /// - `#[permissive]`\
 ///   Convenience mode that implents all supported capabilities, implentations and transparent
@@ -129,6 +131,18 @@ fn handle_capability(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
                     });
                     Ok(())
                 }
+                "value_map" => {
+                    out.extend(quote! {
+                        impl #tt::ValueMap for #name {}
+                    });
+                    Ok(())
+                }
+                "cloned" => {
+                    out.extend(quote! {
+                        impl #tt::Cloned for #name {}
+                    });
+                    Ok(())
+                }
                 v => Err(meta.error(format!("Don't know capability: {v}"))),
             }
         }) {
@@ -184,7 +198,7 @@ fn handle_transparent(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) 
 }
 
 fn crate_path() -> syn::Path {
-    use proc_macro_crate::{crate_name, FoundCrate};
+    use proc_macro_crate::{FoundCrate, crate_name};
     match crate_name("tagged-types") {
         // The macro is used *inside* the tagged-types crate
         Ok(FoundCrate::Itself) => syn::parse_quote!(crate),

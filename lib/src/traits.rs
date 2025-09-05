@@ -30,6 +30,22 @@ pub use cmp::ImplementPartialOrd;
 /// ```
 pub trait InnerAccess {}
 
+/// Enables `TaggedType` to implement `cloned()` method
+/// that converts from `TaggedType<&V, T>` to `TaggedType<V, T>`.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, Cloned};
+/// let user = "admin".to_string();
+/// pub type UsernameRef<'a> = TaggedType<&'a String, UsernameTag>;
+/// pub type Username = TaggedType<String, UsernameTag>;
+/// pub enum UsernameTag {}
+/// impl Cloned for UsernameTag {};
+///
+/// let username: Username = UsernameRef::new(&user).cloned();
+/// ```
+pub trait Cloned {}
+
 /// Enables `TaggedType` to implement `map` of inner data
 ///
 /// This can be useful if Tag is used as braning mechanism
