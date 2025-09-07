@@ -109,7 +109,7 @@ pub trait ImplementDeref {}
 /// ```
 pub trait ImplementDefault {}
 
-/// Enables `TaggedType` to implement `core::fmt::Display` trait
+/// Enables `TaggedType` to implement `core::fmt::Debug` trait
 ///
 /// Example:
 /// ```rust
