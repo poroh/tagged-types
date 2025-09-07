@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+use crate::AsRef;
 use crate::Cloned;
 use crate::FromInner;
 use crate::ImplementAdd;
@@ -140,6 +141,7 @@ impl<V: Clone, T: Cloned> TaggedType<&V, T> {
 impl<V, T: ValueMap> TaggedType<V, T> {
     /// Converts inner type using function f.
     #[inline]
+    #[must_use]
     pub fn map<F, U>(self, f: F) -> TaggedType<U, T>
     where
         F: FnOnce(V) -> U,
@@ -158,6 +160,31 @@ impl<V, T: ValueMap> TaggedType<V, T> {
         F: FnOnce(V) -> Result<U, E>,
     {
         f(self.v).map(TaggedType::<U, T>::new)
+    }
+}
+
+impl<V, T: AsRef> TaggedType<V, T> {
+    /// Converts from `&TaggedType<V, T>` to `TaggedType<&V, T>`.
+    ///
+    /// Example:
+    /// ```rust
+    /// use tagged_types::{TaggedType, AsRef, TransparentDisplay};
+    /// pub type Username = TaggedType<String, UsernameTag>;
+    /// pub type UsernameRef<'a> = TaggedType<&'a String, UsernameTag>;
+    /// pub enum UsernameTag {}
+    /// impl AsRef for UsernameTag {};
+    /// impl TransparentDisplay for UsernameTag {};
+    ///
+    /// pub fn print_username(username: UsernameRef<'_>) {
+    ///     println!("username is {username}");
+    /// }
+    ///
+    /// let username = Username::new("admin".into());
+    /// print_username(username.as_ref());
+    /// ```
+    #[inline]
+    pub const fn as_ref(&self) -> TaggedType<&V, T> {
+        TaggedType::<&V, T>::new(&self.v)
     }
 }
 

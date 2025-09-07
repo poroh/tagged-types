@@ -143,6 +143,12 @@ fn handle_capability(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) {
                     });
                     Ok(())
                 }
+                "as_ref" => {
+                    out.extend(quote! {
+                        impl #tt::AsRef for #name {}
+                    });
+                    Ok(())
+                }
                 v => Err(meta.error(format!("Don't know capability: {v}"))),
             }
         }) {
@@ -198,7 +204,7 @@ fn handle_transparent(derive: &DeriveInput, out: &mut proc_macro2::TokenStream) 
 }
 
 fn crate_path() -> syn::Path {
-    use proc_macro_crate::{FoundCrate, crate_name};
+    use proc_macro_crate::{crate_name, FoundCrate};
     match crate_name("tagged-types") {
         // The macro is used *inside* the tagged-types crate
         Ok(FoundCrate::Itself) => syn::parse_quote!(crate),

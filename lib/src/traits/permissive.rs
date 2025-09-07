@@ -4,6 +4,8 @@ use crate::traits::cmp::ImplementEq;
 use crate::traits::cmp::ImplementOrd;
 use crate::traits::cmp::ImplementPartialEq;
 use crate::traits::cmp::ImplementPartialOrd;
+use crate::traits::AsRef;
+use crate::traits::Cloned;
 use crate::traits::ImplementAdd;
 use crate::traits::ImplementClone;
 use crate::traits::ImplementCopy;
@@ -17,6 +19,7 @@ use crate::traits::TransparentDebug;
 use crate::traits::TransparentDisplay;
 use crate::traits::TransparentFromInner;
 use crate::traits::TransparentFromStr;
+use crate::traits::ValueMap;
 
 #[cfg(feature = "support_serde")]
 use crate::traits::serde::TransparentDeserialize;
@@ -59,7 +62,10 @@ use crate::traits::serde::TransparentSerialize;
 /// ```
 pub trait Permissive {}
 
+impl<T> AsRef for T where T: Permissive {}
+impl<T> Cloned for T where T: Permissive {}
 impl<T> InnerAccess for T where T: Permissive {}
+impl<T> ValueMap for T where T: Permissive {}
 impl<T> ImplementCopy for T where T: Permissive {}
 impl<T> ImplementClone for T where T: Permissive {}
 impl<T> ImplementDefault for T where T: Permissive {}

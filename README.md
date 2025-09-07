@@ -11,7 +11,7 @@ type Gateway = TaggedType<IpAddr, GatewayTag>;
 #[derive(tagged_types::Tag)]
 #[implement(Clone, Copy, PartialEq, Eq, Hash)]
 #[transparent(Display, Debug, FromStr, Serialize, Deserialize)]
-#[capability(inner_access)]
+#[capability(inner_access, from_inner, value_map, cloned, as_ref)]
 enum GatewayTag {}
 
 // Alternatively to define ALL supported properties. Shortcut can
@@ -40,7 +40,7 @@ fn main() {
 
 This library contains helpers to enforce stricter types. Possible application
 can be introduction of new types with limited capabilities in compare to base
-types. 
+types.
 
 For example. You can introduce type Password that don't have `Display` and `Debug`
 traits. But still can be used for comparison and be deserialized using `serde`:
@@ -96,15 +96,16 @@ enum FirmwareVersionTag {}
 ## Design considerations
 
 This library is designed to depend only on the standard library.
-Optionally, it supports serialization and deserialization for the underlying type
-(see the `support_serde` feature).
+Optionally, it supports serialization and deserialization for the
+underlying type (see the `support_serde` feature).
 
 # TaggedType
 
 ## Motivation
 
-In many cases, we want strict types, but we don't want to spend
-a lot of time implementing boilerplate around them (serialization / deserialization / parsing / clone / copy, etc.).
+In many cases, we want strict types, but we don't want to spend a lot
+of time implementing boilerplate around them (serialization /
+deserialization / parsing / clone / copy, etc.).
 
 This library makes it possible to introduce types with minimal effort
 and implements many traits for the new type when the underlying type
@@ -135,6 +136,12 @@ type `V` and enabled for the tag type `T`:
 - `FromStr` if `T` implements `TransparentFromStr`. In this case,
   `FromStr` parses the same as `V`
 
+Additional capabilities that you can opt-in:
+- `inner` / `into_inner` if `T` implements `InnerAccess` marker trait.
+- `From<V>` if `T` implements `FromInner` marker trait.
+- `map` / `try_map` if `T` implements `ValueMap` marker trait.
+- `cloned` if `T` implements `Cloned` marker trait.
+
 ## Conditional feature support
 
 ### Feature `support_serde`
@@ -146,9 +153,10 @@ Conditionally implemented traits when implemented by the underlying type
 
 ### Feature `provide_permissive`
 
-Provides `Permissive` trait that automatically implements all
-defined traits for `T` type.
-
+Provides `Permissive` trait that automatically implements all defined
+traits for `T` type except `Deref`. `Deref` is considered as
+footgun. But you still can opt-in to it by adding `ImplementDeref`
+marker trait to `T`.
 
 ### Feature `provide_derive`
 

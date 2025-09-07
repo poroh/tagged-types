@@ -40,9 +40,11 @@
 
 /// Definition of `TaggedType`.
 pub mod tagged_type;
+
 /// Definitions of crate's traits.
 pub mod traits;
 
+pub use traits::AsRef;
 pub use traits::Cloned;
 pub use traits::FromInner;
 pub use traits::ImplementAdd;
@@ -90,7 +92,7 @@ mod tests {
         #[derive(Tag)]
         #[implement(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
         #[transparent(Debug, Display, FromStr)]
-        #[capability(inner_access, value_map, cloned)]
+        #[capability(inner_access, from_inner, value_map, cloned, as_ref)]
         enum CounterU64Tag {}
 
         let c = CounterU64::default();

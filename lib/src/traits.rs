@@ -66,6 +66,20 @@ pub trait Cloned {}
 /// ```
 pub trait ValueMap {}
 
+/// Enables `TaggedType<V, T>` to implement `fn as_ref(&self) -> TaggedType<&V, T>`.
+///
+/// Example:
+/// ```rust
+/// use tagged_types::{TaggedType, AsRef};
+/// pub type Username = TaggedType<String, UsernameTag>;
+/// pub enum UsernameTag {}
+/// impl AsRef for UsernameTag {};
+///
+/// let username = Username::new("admin".into());
+/// let username_ref: TaggedType<&String, UsernameTag> = username.as_ref();
+/// ```
+pub trait AsRef {}
+
 /// Enables `TaggedType` to implement Deref to inner data.
 ///
 /// Note that this is considered bad practice for tagged type
