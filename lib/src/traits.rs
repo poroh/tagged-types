@@ -87,13 +87,12 @@ pub trait AsRef {}
 ///
 /// Example:
 /// ```rust
-/// use tagged_types::{TaggedType, InnerAccess};
+/// use tagged_types::{TaggedType, ImplementDeref};
 /// pub type Username = TaggedType<String, UsernameTag>;
 /// pub enum UsernameTag {}
-/// impl InnerAccess for UsernameTag {};
+/// impl ImplementDeref for UsernameTag {};
 ///
-/// format!("{}", Username::new("admin".into()).inner());
-/// format!("{}", Username::new("admin".into()).into_inner());
+/// assert!(Username::new("admin".into()).contains("admin"));
 /// ```
 pub trait ImplementDeref {}
 
