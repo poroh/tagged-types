@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-//! tagged-types is a library that simplifies implementation of the [New type idiom](https://doc.rust-lang.org/rust-by-example/generics/new_types.html).
+//! `tagged-types` is a zero-dependency* library that helps you introduce new types
+//! with zero runtime cost.
+//!
+//! \* - you can opt-in using `serde-support` feature to `serde` dependency if you want
+//!     `Serialize`/`Deserialize` implementation for your new type.
 //!
 //! In many cases, we want strict types, but we don't want to spend a
 //! lot of time implementing boilerplate around them (serialization/deserialization/parsing/clone/copy, etc.).
@@ -44,42 +48,64 @@ pub mod tagged_type;
 /// Definitions of crate's traits.
 pub mod traits;
 
-pub use traits::AsRef;
-pub use traits::Cloned;
-pub use traits::FromInner;
-pub use traits::ImplementAdd;
-pub use traits::ImplementClone;
-pub use traits::ImplementCopy;
-pub use traits::ImplementDefault;
-pub use traits::ImplementDeref;
-pub use traits::ImplementDiv;
-pub use traits::ImplementEq;
-pub use traits::ImplementHash;
-pub use traits::ImplementMul;
-pub use traits::ImplementOrd;
-pub use traits::ImplementPartialEq;
-pub use traits::ImplementPartialOrd;
-pub use traits::ImplementSub;
-pub use traits::InnerAccess;
-pub use traits::TransparentDebug;
-pub use traits::TransparentDisplay;
-pub use traits::TransparentFromInner;
-pub use traits::TransparentFromStr;
-pub use traits::ValueMap;
-
+#[doc(inline)]
+pub use tagged_type::TaggedType;
+#[cfg(feature = "provide_derive")]
+#[doc(inline)]
+pub use tagged_types_derive::Tag;
+#[cfg(feature = "provide_permissive")]
+#[doc(inline)]
+pub use traits::permissive::Permissive;
 #[cfg(feature = "support_serde")]
+#[doc(inline)]
 pub use traits::serde::TransparentDeserialize;
 #[cfg(feature = "support_serde")]
+#[doc(inline)]
 pub use traits::serde::TransparentSerialize;
-
-#[cfg(feature = "provide_permissive")]
-pub use traits::permissive::Permissive;
-
-/// Export `TaggedType` from top level.
-pub type TaggedType<V, T> = tagged_type::TaggedType<V, T>;
-
-#[cfg(feature = "provide_derive")]
-pub use tagged_types_derive::Tag;
+#[doc(inline)]
+pub use traits::AsRef;
+#[doc(inline)]
+pub use traits::Cloned;
+#[doc(inline)]
+pub use traits::FromInner;
+#[doc(inline)]
+pub use traits::ImplementAdd;
+#[doc(inline)]
+pub use traits::ImplementClone;
+#[doc(inline)]
+pub use traits::ImplementCopy;
+#[doc(inline)]
+pub use traits::ImplementDefault;
+#[doc(inline)]
+pub use traits::ImplementDeref;
+#[doc(inline)]
+pub use traits::ImplementDiv;
+#[doc(inline)]
+pub use traits::ImplementEq;
+#[doc(inline)]
+pub use traits::ImplementHash;
+#[doc(inline)]
+pub use traits::ImplementMul;
+#[doc(inline)]
+pub use traits::ImplementOrd;
+#[doc(inline)]
+pub use traits::ImplementPartialEq;
+#[doc(inline)]
+pub use traits::ImplementPartialOrd;
+#[doc(inline)]
+pub use traits::ImplementSub;
+#[doc(inline)]
+pub use traits::InnerAccess;
+#[doc(inline)]
+pub use traits::TransparentDebug;
+#[doc(inline)]
+pub use traits::TransparentDisplay;
+#[doc(inline)]
+pub use traits::TransparentFromInner;
+#[doc(inline)]
+pub use traits::TransparentFromStr;
+#[doc(inline)]
+pub use traits::ValueMap;
 
 #[cfg(feature = "provide_derive")]
 #[cfg(test)]

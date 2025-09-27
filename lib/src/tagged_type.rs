@@ -39,6 +39,8 @@ pub mod cmp;
 #[cfg(feature = "support_serde")]
 pub mod serde;
 
+/// Tagged type.
+///
 /// Example for a password type:
 /// ```rust
 /// use tagged_types::TaggedType;
@@ -99,6 +101,7 @@ pub mod serde;
 /// format!("{:?}", Username::new("admin".into()));
 /// format!("{}", Username::new("admin".into()));
 /// ```
+#[repr(transparent)]
 pub struct TaggedType<Value, Tag> {
     v: Value,
     _marker: PhantomData<Tag>,
